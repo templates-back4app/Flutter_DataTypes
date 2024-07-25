@@ -496,6 +496,8 @@ class BookListPage extends StatefulWidget {
 }
 
 class _BookListPageState extends State<BookListPage> {
+  String? get publisherId => null;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -529,15 +531,29 @@ class _BookListPageState extends State<BookListPage> {
 
   // Function to list books
   Future<List<ParseObject>> doListBooks() async {
-    QueryBuilder<ParseObject> queryBooks =
+    QueryBuilder<ParseObject> queryBook =
         QueryBuilder<ParseObject>(ParseObject('Book'))
-          ..includeObject(['publisher']);
-    final ParseResponse apiResponse = await queryBooks.query();
+          ..whereEqualTo('publisher',
+              (ParseObject('Publisher')..objectId = publisherId).toPointer())
+          ..orderByAscending('title');
+    final ParseResponse apiResponse = await queryBook.query();
 
     if (apiResponse.success && apiResponse.results != null) {
       return apiResponse.results as List<ParseObject>;
     } else {
       return [];
     }
+    // QueryBuilder<ParseObject> queryBooks =
+    //     QueryBuilder<ParseObject>(ParseObject('Book'))
+    //       ..includeObject(['publisher']);
+    // final ParseResponse apiResponse = await queryBooks.query();
+
+    // if (apiResponse.success && apiResponse.results != null) {
+    //   return apiResponse.results as List<ParseObject>;
+    // } else {
+    //   return [];
+    // }
   }
+
+  Future getBookDetail(ParseObject book) async {}
 }
