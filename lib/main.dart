@@ -8,8 +8,8 @@ import 'dart:io';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  const keyParseApplicationId = 'YOUR_APP_ID';
-  const keyParseClientKey = 'YOUR_CLIENT_KEY';
+  const keyParseApplicationId = 'ThXBjb9HNe0LhOx8IZDCo4fCdwaewGwwgQVzVTAc';
+  const keyParseClientKey = 'IbY5x4ZF1RCjxi3oHBvOKTvqfC7X4EyMgXUGCHM4';
   const keyParseServerUrl = 'https://parseapi.back4app.com';
   await Parse().initialize(
     keyParseApplicationId,
@@ -19,10 +19,12 @@ void main() async {
     debug: true,
   );
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -30,37 +32,29 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(),
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController _objectIdController = TextEditingController();
   final TextEditingController _stringController = TextEditingController();
   final TextEditingController _doubleController = TextEditingController();
-  final TextEditingController _jsonController = TextEditingController();
   final TextEditingController _listStringController = TextEditingController();
   final TextEditingController _listIntController = TextEditingController();
-  final TextEditingController _listBoolController = TextEditingController();
-  final TextEditingController _listJsonController = TextEditingController();
-  final TextEditingController _latitudeController = TextEditingController();
-  final TextEditingController _longitudeController = TextEditingController();
-  final TextEditingController _polygonController =
-      TextEditingController(); // Polygon field
   final TextEditingController _pointerController =
       TextEditingController(); // Pointer field
-  final TextEditingController _relationController =
-      TextEditingController(); // Relation field
 
   bool _boolValue = false;
   DateTime _selectedDate = DateTime.now();
-  String _responseMessage = '';
+  final String _responseMessage = '';
   XFile? pickedFile;
   bool isLoading = false;
 
@@ -76,10 +70,6 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              _buildTextField('Object ID', _objectIdController),
-              const SizedBox(height: 20),
-              _buildLatitudeLongitudeFields(),
-              const SizedBox(height: 20),
               _buildTextField('String Field', _stringController),
               const SizedBox(height: 20),
               _buildTextField('Double Field', _doubleController,
@@ -97,28 +87,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     'Select Date: ${_selectedDate.toLocal()}'.split(' ')[0]),
               ),
               const SizedBox(height: 20),
-              _buildTextField('JSON Field', _jsonController),
-              const SizedBox(height: 20),
               _buildTextField(
                   'List String Field (comma-separated)', _listStringController),
               const SizedBox(height: 20),
               _buildTextField(
                   'List Int Field (comma-separated)', _listIntController),
               const SizedBox(height: 20),
-              _buildTextField(
-                  'List Bool Field (comma-separated)', _listBoolController),
-              const SizedBox(height: 20),
-              _buildTextField(
-                  'List JSON Field (pipe-separated)', _listJsonController),
-              const SizedBox(height: 20),
-              _buildTextField(
-                  'Polygon Field (JSON)', _polygonController), // Polygon input
-              const SizedBox(height: 20),
               _buildTextField('Pointer Field (Object ID)',
                   _pointerController), // Pointer input
-              const SizedBox(height: 20),
-              _buildTextField('Relation Field (comma-separated Object IDs)',
-                  _relationController), // Relation input
               const SizedBox(height: 20),
               _buildImagePicker(), // Image Picker added
               const SizedBox(height: 20),
@@ -128,18 +104,10 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: _updateData,
-                child: const Text('Update'),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _deleteData,
+                onPressed: () async {
+                  await _deleteData('yourObjectId'); // Pass your argument here
+                },
                 child: const Text('Delete'),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _fetchData,
-                child: const Text('Fetch'),
               ),
               const SizedBox(height: 20),
               Text(_responseMessage),
@@ -156,20 +124,9 @@ class _MyHomePageState extends State<MyHomePage> {
       controller: controller,
       keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
       decoration: InputDecoration(
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
         labelText: label,
       ),
-    );
-  }
-
-  Widget _buildLatitudeLongitudeFields() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        _buildTextField('Latitude', _latitudeController, isNumeric: true),
-        const SizedBox(height: 20),
-        _buildTextField('Longitude', _longitudeController, isNumeric: true),
-      ],
     );
   }
 
@@ -196,7 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
               width: 250,
               height: 250,
               decoration: BoxDecoration(border: Border.all(color: Colors.blue)),
-              child: Center(
+              child: const Center(
                 child: Text('Click here to pick image from Gallery'),
               ),
             ),
@@ -213,6 +170,22 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _saveData() async {
+    //Parse values
+    String stringValue = _stringController.text;
+    List<String> listStringValue = _listStringController.text
+        .split(',') // Split by comma
+        .map((e) =>
+            e.trim()) // Remove any surrounding whitespace from each element
+        .toList();
+    List<int> listtIntValue = _listIntController.text
+        .split(',') // Split by comma
+        .map((e) => int.parse(e.trim())) // Convert each string to an integer
+        .toList();
+    double? doubleValue;
+    doubleValue = double.parse(_doubleController.text);
+    bool boolValue = _boolValue;
+    DateTime selectedDate = _selectedDate;
+
     if (pickedFile != null) {
       setState(() {
         isLoading = true;
@@ -229,41 +202,46 @@ class _MyHomePageState extends State<MyHomePage> {
       await parseFile.save();
 
       final gallery = ParseObject('Gallery')
-        ..set('file', parseFile)
-        ..set('polygon', _parsePolygon(_polygonController.text))
+        ..set('string', stringValue)
+        ..set('double', doubleValue)
+        ..set('bool', boolValue)
+        ..set('date', selectedDate)
+        ..setAddAll('listString', listStringValue)
+        ..setAddAll('listint', listtIntValue)
         ..set('pointer', _parsePointer(_pointerController.text))
-        ..set('relation', _parseRelation(_relationController.text));
+        ..set('file', parseFile);
 
-      await gallery.save();
+      var apiResponse = await gallery.save();
 
-      setState(() {
-        isLoading = false;
-        pickedFile = null;
-      });
+      if (apiResponse.success && apiResponse.results != null) {
+        setState(() {
+          isLoading = false;
+          pickedFile = null;
+        });
 
-      ScaffoldMessenger.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(
-            'File saved successfully on Back4app',
-            style: TextStyle(color: Colors.white),
-          ),
-          duration: Duration(seconds: 3),
-          backgroundColor: Colors.blue,
-        ));
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(const SnackBar(
+            content: Text(
+              'File saved successfully on Back4app',
+              style: TextStyle(color: Colors.white),
+            ),
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.blue,
+          ));
+      } else {
+        print("This is your request error: ${apiResponse.error}");
+      }
     }
   }
 
-  Future<void> _updateData() async {
-    // Update data logic
-  }
-
-  Future<void> _deleteData() async {
+  Future<void> _deleteData(String objectId) async {
     // Delete data logic
-  }
+    final parseObject = ParseObject('Gallery')
+      ..objectId = objectId
+      ..unset("listString");
 
-  Future<void> _fetchData() async {
-    // Fetch data logic
+    var parseResponse = await parseObject.save();
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -273,29 +251,17 @@ class _MyHomePageState extends State<MyHomePage> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate)
+    if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
       });
-  }
-
-  // Convert Polygon field to a suitable format
-  ParseObject _parsePolygon(String polygonJson) {
-    // Example: {"type": "Polygon", "coordinates": [[[lng, lat], [lng, lat], [lng, lat]]]}
-    return ParseObject('Polygon')..set('data', polygonJson);
+    }
   }
 
   // Convert Pointer field to a suitable format
   ParseObject _parsePointer(String objectId) {
-    return ParseObject('Pointer')..set('objectId', objectId);
-  }
-
-  // Convert Relation field to a suitable format
-  List<ParseObject> _parseRelation(String objectIds) {
-    final ids = objectIds
-        .split(',')
-        .map((id) => ParseObject('Pointer')..set('objectId', id.trim()))
-        .toList();
-    return ids;
+    final bookPointer = ParseObject('Book');
+    bookPointer.objectId = objectId;
+    return bookPointer;
   }
 }
