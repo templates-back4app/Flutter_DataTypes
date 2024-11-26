@@ -15,16 +15,16 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   parse_server_sdk_flutter: ^8.0.0
+  geolocator: ^9.0.2
 
-  flutter_gen: any
   image_picker: 1.1.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner:
-  flutter_gen_runner: 5.6.0
 
   flutter_lints: ^3.0.0
+  test: ^1.24.9
 
 flutter:
   uses-material-design: true

@@ -51,5 +51,9 @@
 	<string>Test the camera operation </string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Test the microphone operation </string>
+	<key>NSLocationUsageDescription</key>
+	<string>Test GeoLocation </string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Test GeoLocation desc</string>
 </dict>
 </plist>
